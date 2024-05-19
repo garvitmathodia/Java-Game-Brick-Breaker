@@ -26,6 +26,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener
 	private int ballYdir = -2;
 	
 	private MapGenerator map;
+	private Difficulty difficulty;
 	
 	public Gameplay()
 	{		
@@ -35,111 +36,131 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener
 		setFocusTraversalKeysEnabled(false);
         timer=new Timer(delay,this);
 		timer.start();
+		setDifficulty(Difficulty.EASY);
 	}
+
+	public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
+        switch (difficulty) {
+            case EASY:
+                ballXdir = -1;
+                ballYdir = -2;
+                break;
+            case MEDIUM:
+                ballXdir = -2;
+                ballYdir = -3;
+                break;
+            case HARD:
+                ballXdir = -3;
+                ballYdir = -4;
+                break;
+        }
+    }
 	
 	public void paint(Graphics g)
 	{    		
-		// background
 		g.setColor(Color.black);
 		g.fillRect(1, 1, 692, 592);
-		
+	
 		// drawing map
 		map.draw((Graphics2D) g);
-		
+	
 		// borders
 		g.setColor(Color.yellow);
 		g.fillRect(0, 0, 3, 592);
 		g.fillRect(0, 0, 692, 3);
 		g.fillRect(691, 0, 3, 592);
-		
-		// the scores 		
+	
+		// the scores
 		g.setColor(Color.white);
-		g.setFont(new Font("serif",Font.BOLD, 25));
-		g.drawString(""+score, 590,30);
-		
+		g.setFont(new Font("serif", Font.BOLD, 25));
+		g.drawString("Score: " + score, 590, 30);
+	
+		// display difficulty level
+		g.drawString("Difficulty: " + difficulty, 20, 30);
+	
 		// the paddle
 		g.setColor(Color.green);
 		g.fillRect(playerX, 550, 100, 8);
-		
+	
 		// the ball
 		g.setColor(Color.yellow);
 		g.fillOval(ballposX, ballposY, 20, 20);
 	
 		// when you won the game
-		if(totalBricks <= 0)
-		{
-			 play = false;
-             ballXdir = 0;
-     		 ballYdir = 0;
-             g.setColor(Color.RED);
-             g.setFont(new Font("serif",Font.BOLD, 30));
-             g.drawString("You Won", 260,300);
-             
-             g.setColor(Color.RED);
-             g.setFont(new Font("serif",Font.BOLD, 20));           
-             g.drawString("Press (Enter) to Restart", 230,350);  
+		if (totalBricks <= 0) {
+			play = false;
+			ballXdir = 0;
+			ballYdir = 0;
+			g.setColor(Color.RED);
+			g.setFont(new Font("serif", Font.BOLD, 30));
+			g.drawString("You Won", 260, 300);
+	
+			g.setColor(Color.RED);
+			g.setFont(new Font("serif", Font.BOLD, 20));
+			g.drawString("Press (Enter) to Restart", 230, 350);
 		}
-		
+	
 		// when you lose the game
-		if(ballposY > 570)
-        {
-			 play = false;
-             ballXdir = 0;
-     		 ballYdir = 0;
-             g.setColor(Color.RED);
-             g.setFont(new Font("serif",Font.BOLD, 30));
-             g.drawString("Game Over, Scores: "+score, 190,300);
-             
-             g.setColor(Color.RED);
-             g.setFont(new Font("serif",Font.BOLD, 20));           
-             g.drawString("Press (Enter) to Restart", 230,350);        
-        }
-		
+		if (ballposY > 570) {
+			play = false;
+			ballXdir = 0;
+			ballYdir = 0;
+			g.setColor(Color.RED);
+			g.setFont(new Font("serif", Font.BOLD, 30));
+			g.drawString("Game Over, Scores: " + score, 190, 300);
+	
+			g.setColor(Color.RED);
+			g.setFont(new Font("serif", Font.BOLD, 20));
+			g.drawString("Press (Enter) to Restart", 230, 350);
+		}
+	
 		g.dispose();
 	}	
 
 	public void keyPressed(KeyEvent e) 
 	{
-		if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-		{        
-			if(playerX >= 600)
-			{
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			if (playerX >= 600) {
 				playerX = 600;
-			}
-			else
-			{
+			} else {
 				moveRight();
 			}
-        }
+		}
 		
-		if (e.getKeyCode() == KeyEvent.VK_LEFT)
-		{          
-			if(playerX < 10)
-			{
+		if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+			if (playerX < 10) {
 				playerX = 10;
-			}
-			else
-			{
+			} else {
 				moveLeft();
 			}
-        }		
-		if (e.getKeyCode() == KeyEvent.VK_ENTER)
-		{          
-			if(!play)
-			{
+		}
+		
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if (!play) {
 				play = true;
 				ballposX = 120;
 				ballposY = 350;
-				ballXdir = -1;
-				ballYdir = -2;
+				setDifficulty(difficulty); // Reset ball speed to the current difficulty level
 				playerX = 310;
 				score = 0;
 				totalBricks = 21;
 				map = new MapGenerator(3, 7);
-				
 				repaint();
 			}
-        }		
+		}
+		
+		if (e.getKeyCode() == KeyEvent.VK_1) {
+			setDifficulty(Difficulty.EASY);
+		}
+		
+		if (e.getKeyCode() == KeyEvent.VK_2) {
+			setDifficulty(Difficulty.MEDIUM);
+		}
+		
+		if (e.getKeyCode() == KeyEvent.VK_3) {
+			setDifficulty(Difficulty.HARD);
+		}		
 	}
 
 	public void keyReleased(KeyEvent e) {}
